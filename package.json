@@ -1,0 +1,47 @@
+{
+  "name": "chx-cli",
+  "version": "1.0.10",
+  "main": "src/index.ts",
+  "type": "module",
+  "bin": {
+    "chx-cli": "./dist/src/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "haiku",
+    "extension"
+  ],
+  "author": "Le Dinh Chinh",
+  "license": "ISC",
+  "description": "CLi for Haiku team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Koteru-Haiku/cli.git"
+  },
+  "dependencies": {
+    "chalk": "^5.4.0",
+    "chalk-animation": "^2.0.3",
+    "commander": "^12.1.0",
+    "figlet": "^1.8.0",
+    "gradient-string": "^3.0.0",
+    "inquirer": "^12.2.0",
+    "nanospinner": "^1.2.2",
+    "qr-image": "^3.2.0",
+    "qrcode": "^1.5.4",
+    "qrcode-reader": "^1.0.4",
+    "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {
+    "@types/chalk-animation": "^1.6.3",
+    "@types/figlet": "^1.7.0",
+    "@types/node": "^22.10.2",
+    "@types/qrcode": "^1.5.5",
+    "@types/readline-sync": "^1.4.8",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}
