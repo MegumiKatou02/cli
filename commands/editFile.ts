@@ -1,7 +1,8 @@
 import readlineSync from "readline-sync";
+import { handleAnswer } from "../Util/Handle.js";
 
 // Chỉnh sửa file
-export function editFile(content: string[]): string[] {
+export async function editFile(content: string[]): Promise<string[]> {
   let editing = true;
   while (editing) {
     const action = readlineSync.question("Choose action (add/edit/delete/save/exit): ");
@@ -15,7 +16,8 @@ export function editFile(content: string[]): string[] {
         if (editLine >= 0 && editLine < content.length) {
           content[editLine] = readlineSync.question("New content: ");
         } else {
-          console.log("Invalid line number");
+          // console.log("Invalid line number");
+          await handleAnswer(false, "Invalid line number");
         }
         break;
       case "delete":
@@ -23,7 +25,7 @@ export function editFile(content: string[]): string[] {
         if (deleteLine >= 0 && deleteLine < content.length) {
           content.splice(deleteLine, 1);
         } else {
-          console.log("Invalid line number");
+          await handleAnswer(false, "Invalid line number");
         }
         break;
       case "save":

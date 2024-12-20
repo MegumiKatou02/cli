@@ -4,11 +4,11 @@ import { handleAnswer } from '../Util/Handle.js';
 async function generateQRCode(text) {
     try {
         await qrcode.toFile('qrcode.png', text);
-        return handleAnswer(true, "QR code has been generated and saved at qrcode.png", "");
+        return handleAnswer(true, "QR code has been generated and saved at qrcode.png");
         // console.log('Mã QR đã được tạo và lưu tại qrcode.png');
     }
     catch (error) {
-        return handleAnswer(false, "", "Error generating QR code");
+        return handleAnswer(false, "Error generating QR code");
         // console.error('Lỗi khi tạo mã QR:', error);
     }
 }
@@ -25,7 +25,7 @@ export function qrCommand() {
             });
         }
         else if (action === 'N' || action === 'n') {
-            return handleAnswer(false, "", "Cancel QR code generation");
+            return handleAnswer(false, "Cancel QR code generation");
             // console.log('Quá trình tạo mã QR đã bị hủy.');
             rl.close();
         }

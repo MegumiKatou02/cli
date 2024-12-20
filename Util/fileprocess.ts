@@ -1,6 +1,7 @@
 import * as fs from "fs";
+import { handleAnswer } from "./Handle.js";
 
-export function readFile(filePath: string): string[] {
+export async function readFile(filePath: string): Promise<string[]> {
   if (!fs.existsSync(filePath)) {
     console.error("File not found.");
     process.exit(1);
@@ -8,7 +9,8 @@ export function readFile(filePath: string): string[] {
 
   const stats = fs.statSync(filePath);
   if (stats.isDirectory()) {
-    console.error("Path is a directory. Please specify a file path");
+    await handleAnswer(false, "Path is a directory. Please specify a file path");
+    // console.error("Path is a directory. Please specify a file path");
     process.exit(1);
   }
 
@@ -16,7 +18,8 @@ export function readFile(filePath: string): string[] {
   return content.split("\n");
 }
 
-export function saveFile(filePath: string, content: string[]): void {
+export async function saveFile(filePath: string, content: string[]): Promise<void> {
   fs.writeFileSync(filePath, content.join("\n"));
-  console.log("File saved successfully.");
+    await handleAnswer(true, "File saed successfully");
+  // console.log("File saved successfully.");
 }

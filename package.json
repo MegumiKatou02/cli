@@ -1,6 +1,6 @@
 {
   "name": "chx-cli",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "main": "src/index.ts",
   "type": "module",
   "bin": {
@@ -23,17 +23,20 @@
     "url": "https://github.com/Koteru-Haiku/cli.git"
   },
   "dependencies": {
+    "@types/jimp": "^0.2.1",
     "chalk": "^5.4.0",
     "chalk-animation": "^2.0.3",
+    "child_process": "^1.0.2",
     "commander": "^12.1.0",
     "figlet": "^1.8.0",
     "gradient-string": "^3.0.0",
     "inquirer": "^12.2.0",
     "nanospinner": "^1.2.2",
+    "package-json": "^10.0.1",
     "qr-image": "^3.2.0",
     "qrcode": "^1.5.4",
-    "qrcode-reader": "^1.0.4",
-    "readline-sync": "^1.4.10"
+    "readline-sync": "^1.4.10",
+    "simple-git": "^3.27.0"
   },
   "devDependencies": {
     "@types/chalk-animation": "^1.6.3",
