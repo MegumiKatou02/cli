@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import fs from 'fs';
 import { Command } from 'commander';
 import { showVersion } from '../commands/version.js';
 import { qrCommand } from '../commands/qr.js';
@@ -80,8 +79,8 @@ program
     .description('Update to the latest version of CLI')
     .action(async () => {
     try {
-        const { name, version: currentVersion } = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
-        const latestVersion = (await packageJson(name)).version;
+        const currentVersion = VERSION;
+        const latestVersion = (await packageJson('chx-cli')).version;
         console.log(`Current version: ${currentVersion}`);
         console.log(`Latest version available: ${latestVersion}`);
         if (currentVersion === latestVersion) {

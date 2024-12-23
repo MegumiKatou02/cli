@@ -7,7 +7,12 @@
       "esModuleInterop": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
-      "outDir": "./dist"
+      "outDir": "./dist",
+      "paths": {
+        "@/*": ["./src/*"],
+        "@config/*": ["./*"]
+      },
+      "resolveJsonModule": true
     },
     "include": ["src/**/*", "commands/**/*", "constants/**/*", "Util/**/*"],
     "exclude": ["node_modules", "**/*.spec.ts"]

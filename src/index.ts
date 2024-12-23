@@ -89,14 +89,14 @@ program
     }
   });
 
-  program
+program
   .command('update')
   .description('Update to the latest version of CLI')
   .action(async () => {
     try {
-      const { name, version: currentVersion } = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
-      
-      const latestVersion = (await packageJson(name)).version;
+      const currentVersion = VERSION;
+      const latestVersion = (await packageJson('chx-cli')).version;
+
       console.log(`Current version: ${currentVersion}`);
       console.log(`Latest version available: ${latestVersion}`);
 
@@ -107,7 +107,7 @@ program
 
       console.log('Updating to latest version...');
       execSync('npm install -g chx-cli@latest', { stdio: 'inherit' });
-      
+
       console.log(`Successfully updated CLI from ${currentVersion} to ${latestVersion}`);
     } catch (error) {
       console.error('Error updating to the latest version:', error);
