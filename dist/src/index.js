@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import fs from 'fs';
 import { Command } from 'commander';
 import { showVersion } from '../commands/version.js';
 import { qrCommand } from '../commands/qr.js';
@@ -10,18 +11,103 @@ import { countFilesAndFoldersDeep } from '../commands/countfiles/countfilesdeep.
 import { getWeatherCommand } from '../commands/getweather.js';
 import { monitorSystemCommand } from '../commands/monitorSystem.js';
 import { convertImageCommand } from '../commands/convertImage.js';
-import { readFile, saveFile } from "../util/fileprocess.js";
+import { resizeImage } from '../commands/imageresize.js';
+import { readFile, saveFile } from "../utils/fileprocess.js";
 import { editFile } from "../commands/editFile.js";
 import readlineSync from "readline-sync";
 import simpleGit from 'simple-git';
 import packageJson from 'package-json';
 import { execSync } from 'child_process';
+import { listProcesses } from '../commands/system/listProccesses.js';
+import { killProcess } from '../commands/system/killProcess.js';
+import { monitorProcess } from '../utils/processUtils.js';
+import { handleFindProcess } from '../commands/system/findProcess.js';
+import { getNetworkInfo } from '../commands/networkInfo.js';
+import { encryptFile } from '../commands/code/encrypt.js';
+import { decryptFile } from '../commands/code/decrypt.js';
 const git = simpleGit();
 const program = new Command();
 program
     .name('haiku')
     .description('A custom CLI tool for special tasks')
     .version(`${VERSION}`, '-v, --version', 'Show current version of Haiku CLI');
+program
+    .command('encrypt <inputFile> <outputFile>')
+    .description('Encrypt a file')
+    .action((inputFile, outputFile) => {
+    encryptFile(inputFile, outputFile);
+});
+program
+    .command('decrypt <inputFile> <outputFile>')
+    .description('Decrypt a file')
+    .action((inputFile, outputFile) => {
+    decryptFile(inputFile, outputFile);
+});
+program
+    .command('myip')
+    .description('Show your IP')
+    .action(() => {
+    const info = getNetworkInfo();
+    info.forEach((iface) => {
+        console.log(`Interface: ${iface.interface}`);
+        console.log(`IP Address: ${iface.ip}`);
+        console.log('-------------------------');
+    });
+});
+program
+    .command('list')
+    .description('List all running processes')
+    .action(listProcesses);
+program
+    .command('kill <pid>')
+    .description('Kill a process by PID')
+    .action((pid) => {
+    killProcess(parseInt(pid));
+});
+program
+    .command('monitor <pid>')
+    .description('Monitor a process by PID')
+    .action((pid) => {
+    monitorProcess(parseInt(pid));
+});
+program
+    .command('find <name>')
+    .description('Find processes by name')
+    .option('-e, --exact', 'Exact match')
+    .option('-l, --limit <number>', 'Limit the number of results', parseInt)
+    .action((name, options) => {
+    handleFindProcess(name, options.exact, options.limit);
+});
+program
+    .command('resize <input> <output>')
+    .description('Resize an image and adjust its quality.')
+    .option('-w, --width <number>', 'Target width in pixels')
+    .option('-h, --height <number>', 'Target height in pixels')
+    .option('-q, --quality <number>', 'Output quality (0-100)', '75')
+    .action(async (input, output, options) => {
+    try {
+        if (!fs.existsSync(input)) {
+            throw new Error(`Input file not found: ${input}`);
+        }
+        const width = options.width ? parseInt(options.width) : undefined;
+        const height = options.height ? parseInt(options.height) : undefined;
+        const quality = options.quality ? parseInt(options.quality) : 75;
+        if (width !== undefined && isNaN(width)) {
+            throw new Error('Width must be a valid number.');
+        }
+        if (height !== undefined && isNaN(height)) {
+            throw new Error('Height must be a valid number.');
+        }
+        if (isNaN(quality) || quality < 0 || quality > 100) {
+            throw new Error('Quality must be a number between 0 and 100.');
+        }
+        await resizeImage(input, output, width, height, quality);
+        console.log(`Image saved to ${output}`);
+    }
+    catch (err) {
+        console.error('Error:', err instanceof Error ? err.message : 'An unknown error occurred.');
+    }
+});
 program.addCommand(convertImageCommand);
 program
     .command(getWeatherCommand.command) // thu cach viet moi :3

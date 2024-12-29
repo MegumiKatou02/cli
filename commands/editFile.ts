@@ -1,5 +1,5 @@
 import readlineSync from "readline-sync";
-import { handleAnswer } from "../util/Handle.js";
+import { handleAnswer } from "../utils/Handle.js";
 
 // Chỉnh sửa file
 export async function editFile(content: string[]): Promise<string[]> {
