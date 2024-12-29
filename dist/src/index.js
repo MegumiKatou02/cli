@@ -3,10 +3,11 @@ import { Command } from 'commander';
 import { showVersion } from '../commands/version.js';
 import { qrCommand } from '../commands/qr.js';
 import { welcome } from '../commands/info.js';
-import { Option } from '../commands/password.js';
+import { OptionPassword } from '../commands/password.js';
 import { VERSION } from '../constants/version.js';
-import { countFilesAndFolders } from '../commands/countfiles.js';
-import { readFile, saveFile } from "../Util/fileprocess.js";
+import { countFilesAndFoldersShallow } from '../commands/countfiles/countfiles.js';
+import { countFilesAndFoldersDeep } from '../commands/countfiles/countfilesdeep.js';
+import { readFile, saveFile } from "../util/fileprocess.js";
 import { editFile } from "../commands/editFile.js";
 import readlineSync from "readline-sync";
 import simpleGit from 'simple-git';
@@ -40,13 +41,24 @@ program
     .command('password')
     .description('Generate random password with options')
     .action(() => {
-    Option();
+    OptionPassword();
 });
 program
     .command("count <path>")
+    .option("--d", "Recursively count files and folders in subdirectories")
     .description("Count files and folders in a directory")
-    .action(async (folderPath) => {
-    await countFilesAndFolders(folderPath);
+    .action(async (path, options) => {
+    try {
+        if (options.d) {
+            await countFilesAndFoldersDeep(path);
+        }
+        else {
+            await countFilesAndFoldersShallow(path);
+        }
+    }
+    catch (error) {
+        console.error("An error occurred:", error);
+    }
 });
 program
     .command("edit")

@@ -23,7 +23,7 @@
     "url": "https://github.com/Koteru-Haiku/cli.git"
   },
   "dependencies": {
-    "@types/jimp": "^0.2.1",
+    "@types/jimp": "^0.2.28",
     "chalk": "^5.4.0",
     "chalk-animation": "^2.0.3",
     "child_process": "^1.0.2",

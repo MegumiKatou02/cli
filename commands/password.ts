@@ -25,7 +25,7 @@ export function generatePassword(length: number, useUpper: boolean, useLower: bo
   return password;
 }
 
-export async function Option() {
+export async function OptionPassword() {
   const answers = await inquirer.prompt([
     {
       name: "length",

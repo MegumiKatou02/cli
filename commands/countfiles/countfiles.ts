@@ -2,7 +2,7 @@ import { readdir } from "fs/promises";
 import { statSync } from "fs";
 import path from "path";
 
-export async function countFilesAndFolders(folderPath: string) {
+export async function countFilesAndFoldersShallow(folderPath: string) {
   const entries = await readdir(folderPath);
   let fileCount = 0;
   let folderCount = 0;
