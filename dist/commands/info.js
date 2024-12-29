@@ -1,4 +1,4 @@
-import gradient from "gradient-string";
+import { pastel } from "gradient-string";
 import figlet from "figlet";
 export function welcome() {
     console.clear();
@@ -6,9 +6,10 @@ export function welcome() {
                       - Haiku Team -`;
     figlet(msg ?? '', (err, data) => {
         if (data === undefined) {
-            console.log(gradient.pastel.multiline('test'));
+            console.log(pastel.multiline('test'));
         }
-        else
-            console.log(gradient.pastel.multiline(data));
+        else {
+            console.log(pastel.multiline(data));
+        }
     });
 }

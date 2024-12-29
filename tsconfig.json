@@ -15,6 +15,6 @@
       },
       "resolveJsonModule": true
     },
-    "include": ["src/**/*", "commands/**/*", "constants/**/*", "util/**/*"],
+    "include": ["src/**/*", "commands/**/*", "constants/**/*", "util/**/*", "services/**/*"],
     "exclude": ["node_modules", "**/*.spec.ts"]
   }
