@@ -1,10 +1,7 @@
-// services/weatherservice.ts
 import axios from 'axios';
-import dotenv from 'dotenv';
+import * as config from '../constants/config.js'
 
-dotenv.config();
-
-const apiKey = process.env.OPENWEATHERMAP_API_KEY;
+const apiKey = config.OPENWEATHERMAP_API_KEY
 
 if (!apiKey) {
   throw new Error('OpenWeatherMap API key not found. Please set OPENWEATHERMAP_API_KEY in .env file.');

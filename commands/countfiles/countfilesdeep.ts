@@ -1,30 +1,35 @@
-import { readdir } from 'fs/promises';
+import { readdir, lstat } from 'fs/promises';
 import path from 'path';
 
 export async function countFilesAndFoldersDeep(folderPath: string) {
   let fileCount = 0;
   let folderCount = 0;
 
-  const traverse = async (currentPath: string) => {
+  const stack = [folderPath];
+  while (stack.length > 0) {
+    const currentPath = stack.pop();
+    if (!currentPath) continue;
+
     try {
       const entries = await readdir(currentPath, { withFileTypes: true });
-
       for (const entry of entries) {
         const fullPath = path.join(currentPath, entry.name);
+
+        if (entry.isSymbolicLink()) {
+          continue;
+        }
 
         if (entry.isFile()) {
           fileCount++;
         } else if (entry.isDirectory()) {
           folderCount++;
-          await traverse(fullPath);
+          stack.push(fullPath);
         }
       }
     } catch (error) {
-      console.error(`Error reading directory ${currentPath}:`, error);
+      console.warn(`Skipped inaccessible directory: ${currentPath}`);
     }
-  };
-
-  await traverse(folderPath);
+  }
 
   console.log(`Total Files: ${fileCount}`);
   console.log(`Total Folders: ${folderCount}`);

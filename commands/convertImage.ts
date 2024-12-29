@@ -13,7 +13,7 @@ export const convertImageCommand = new Command('convert-image')
     
     if (!fs.existsSync(inputPath)) {
       console.error(`File not found: ${inputPath}`);
-      process.exit(1);
+      return;
     }
     
     const outputPath = changeExtension(inputPath, outputFormat);
@@ -23,9 +23,7 @@ export const convertImageCommand = new Command('convert-image')
       console.log(`Image saved to ${outputPath}`);
     } catch (error) {
       console.error(`Error converting image: ${(error as Error).message}`);
-      process.exit(1);
     }
-    process.exit(0);
   });
   
 function changeExtension(inputPath: string, extension: string): string {

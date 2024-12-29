@@ -7,15 +7,16 @@ import { createSpinner } from "nanospinner";
 
 const sleep = (ms = 2000) => new Promise((r) => setTimeout(r, ms));
 
-export async function handleAnswer(isCorrect: boolean, anwser: string) {
+export async function handleAnswer(isCorrect: boolean, answer: string) {
     const spinner = createSpinner('Checking answer..').start();
     await sleep();
 
-    if(isCorrect) {
-        spinner.success({ text: `${anwser}`});
-    }
-    else {
-        spinner.error({ text: `${anwser}`});
-        process.exit(1);
+    if (isCorrect) {
+      spinner.success({ text: chalk.green(answer) });
+      // return true;
+  } else {
+      spinner.error({ text: chalk.red(answer) });
+      // return false;
+      process.exit(1)
     }
 } 

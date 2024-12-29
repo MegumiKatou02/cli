@@ -19,9 +19,9 @@ import { execSync } from 'child_process';
 const git = simpleGit();
 const program = new Command();
 program
-    .name('chx-cli')
+    .name('haiku')
     .description('A custom CLI tool for special tasks')
-    .version(`${VERSION}`, '-v, --version', 'Show current version of chx-cli');
+    .version(`${VERSION}`, '-v, --version', 'Show current version of Haiku CLI');
 program.addCommand(convertImageCommand);
 program
     .command(getWeatherCommand.command) // thu cach viet moi :3
@@ -53,8 +53,13 @@ program
 program
     .command('password')
     .description('Generate random password with options')
-    .action(() => {
-    OptionPassword();
+    .action(async () => {
+    try {
+        await OptionPassword();
+    }
+    catch (error) {
+        console.log(error.message);
+    }
 });
 program
     .command("count <path>")
@@ -77,14 +82,19 @@ program
     .command("edit")
     .description("edit file")
     .action(async () => {
-    const filePath = readlineSync.question("Enter file path: ");
-    const content = await readFile(filePath);
-    console.log("=== File content ===");
-    content.forEach((line, index) => {
-        console.log(`${index + 1}: ${line}`);
-    });
-    const updatedContent = await editFile(content);
-    await saveFile(filePath, updatedContent);
+    try {
+        const filePath = readlineSync.question("Enter file path: ");
+        const content = await readFile(filePath);
+        console.log("=== File content ===");
+        content.forEach((line, index) => {
+            console.log(`${index + 1}: ${line}`);
+        });
+        const updatedContent = await editFile(content);
+        await saveFile(filePath, updatedContent);
+    }
+    catch (error) {
+        console.log(error.message);
+    }
 });
 program
     .command('clone <repoUrl>')
@@ -105,7 +115,7 @@ program
     .action(async () => {
     try {
         const currentVersion = VERSION;
-        const latestVersion = (await packageJson('chx-cli')).version;
+        const latestVersion = (await packageJson('@yukiookii/haiku')).version;
         console.log(`Current version: ${currentVersion}`);
         console.log(`Latest version available: ${latestVersion}`);
         if (currentVersion === latestVersion) {
@@ -113,7 +123,7 @@ program
             return;
         }
         console.log('Updating to latest version...');
-        execSync('npm install -g chx-cli@latest', { stdio: 'inherit' });
+        execSync('npm install -g @yukiookii/haiku@latest', { stdio: 'inherit' });
         console.log(`Successfully updated CLI from ${currentVersion} to ${latestVersion}`);
     }
     catch (error) {

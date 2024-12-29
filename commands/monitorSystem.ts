@@ -2,43 +2,45 @@ import * as os from 'os';
 import clear from 'clear';
 import * as readline from 'readline';
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-function createCPUMonitor() {
+function createCPUMonitor(): () => (callback: (cpuUsage: number) => void) => void {
   let prevTotal = 0;
   let prevIdle = 0;
 
-  return function getCPUPercentage(callback: (cpuUsage: number) => void): void {
-    const cpus = os.cpus();
-    let total = 0;
-    let idle = 0;
-    cpus.forEach((cpu) => {
-      Object.values(cpu.times).forEach((time) => {
-        total += time;
+  return function () {
+    return function getCPUPercentage(callback: (cpuUsage: number) => void): void {
+      const cpus = os.cpus();
+      let total = 0;
+      let idle = 0;
+      cpus.forEach((cpu) => {
+        Object.values(cpu.times).forEach((time) => {
+          total += time;
+        });
+        idle += cpu.times.idle;
       });
-      idle += cpu.times.idle;
-    });
-    if (prevTotal === 0 || prevIdle === 0) {
-      prevTotal = total;
-      prevIdle = idle;
-      callback(0);
-    } else {
-      const totalDelta = total - prevTotal;
-      const idleDelta = idle - prevIdle;
-      const cpuUsage = 1 - (idleDelta / totalDelta);
-      callback(cpuUsage * 100);
-      prevTotal = total;
-      prevIdle = idle;
-    }
+      if (prevTotal === 0 || prevIdle === 0) {
+        prevTotal = total;
+        prevIdle = idle;
+        callback(0);
+      } else {
+        const totalDelta = total - prevTotal;
+        const idleDelta = idle - prevIdle;
+        const cpuUsage = 1 - (idleDelta / totalDelta);
+        callback(cpuUsage * 100);
+        prevTotal = total;
+        prevIdle = idle;
+      }
+    };
   };
 }
 
-const getCPUPercentage = createCPUMonitor();
+const getCPUPercentage = createCPUMonitor()();
 
 function monitorSystem() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
   const intervalId = setInterval(() => {
     clear();
     console.log('System Monitor');
@@ -63,7 +65,6 @@ function monitorSystem() {
       clearInterval(intervalId);
       rl.close();
       console.log('Exiting system monitor...');
-      process.exit();
     }
   });
 }

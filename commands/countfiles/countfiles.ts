@@ -1,5 +1,4 @@
-import { readdir } from "fs/promises";
-import { statSync } from "fs";
+import { readdir, stat } from "fs/promises";
 import path from "path";
 
 export async function countFilesAndFoldersShallow(folderPath: string) {
@@ -7,15 +6,19 @@ export async function countFilesAndFoldersShallow(folderPath: string) {
   let fileCount = 0;
   let folderCount = 0;
 
-  entries.forEach((entry) => {
+  for (const entry of entries) {
     const fullPath = path.join(folderPath, entry);
-    const stats = statSync(fullPath);
-    if (stats.isFile()) {
-      fileCount++;
-    } else if (stats.isDirectory()) {
-      folderCount++;
+    try {
+      const stats = await stat(fullPath);
+      if (stats.isFile()) {
+        fileCount++;
+      } else if (stats.isDirectory()) {
+        folderCount++;
+      }
+    } catch (error) {
+      console.warn(`Access denied or file/directory not accessible: ${fullPath}`);
     }
-  });
+  }
 
   console.log(`Files: ${fileCount}`);
   console.log(`Folders: ${folderCount}`);
