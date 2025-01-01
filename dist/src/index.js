@@ -32,23 +32,50 @@ import { searchCharacter } from '../commands/anime/searchCharacter.js';
 import { searchAnime } from '../commands/anime/searchAnime.js';
 import { createGIF } from '../commands/image/creategif.js';
 import * as git from '../commands/git/git.js';
+import { TruyenDexImageDownloader } from '../public/manga/MangaDexAPI.js';
+import { LightNovelDownloader } from '../public/lightnovel/LightNovel.js';
 const program = new Command();
 program
     .name('haiku')
     .description('A custom CLI tool for special tasks')
     .version(`${VERSION}`, '-v, --version', 'Show current version of Haiku CLI');
 program
+    .command('manga')
+    .description('Download manga from MangaDex or TruyenDex')
+    .requiredOption('-u, --url <url>', 'URL of the manga to download')
+    .option('-p, --platform <platform>', 'Platform to download from (MangaDex or TruyenDex)', 'MangaDex')
+    .action(async (options) => {
+    const downloader = new TruyenDexImageDownloader((message) => console.log(message));
+    downloader.setupTitle(options.platform);
+    await downloader.downloadManga(options.url);
+});
+program
+    .command('ln')
+    .description('Download light novels to txt files')
+    .requiredOption('-u, --url <url>', 'URL of the light novel to download')
+    .option('-d, --domain <domain>', 'Domain to download from (default: ln.hako.vn)', 'ln.hako.vn')
+    .action(async (options) => {
+    const downloader = new LightNovelDownloader((message) => console.log(message));
+    downloader.setupDomain(options.domain);
+    await downloader.downloadLightNovel(options.url);
+});
+program
     .command('create-gif <inputFolder> <outputFile>')
     .description('Create a GIF from multiple images in a folder')
-    .option('--delay <number>', 'Delay between frames in milliseconds', '100')
-    .option('--width <number>', 'Width of the GIF', '500')
-    .option('--height <number>', 'Height of the GIF', '500')
+    .option('-d --delay <number>', 'Delay between frames in milliseconds', '100')
+    .option('-w --width <number>', 'Width of the GIF', '500')
+    .option('-h --height <number>', 'Height of the GIF', '500')
     .action(async (inputFolder, outputFile, options) => {
-    await createGIF(inputFolder, outputFile, {
-        delay: parseInt(options.delay),
-        width: parseInt(options.width),
-        height: parseInt(options.height),
-    });
+    try {
+        await createGIF(inputFolder, outputFile, {
+            delay: parseInt(options.delay),
+            width: parseInt(options.width),
+            height: parseInt(options.height),
+        });
+    }
+    catch (error) {
+        console.error('Error creating GIF:', error.message);
+    }
 });
 program
     .command('anime')
@@ -74,8 +101,7 @@ program
 program
     .command('add <name> <url>')
     .description('Add a new bookmark')
-    .option('-t, --tags <tags>', 'Add tags to the bookmark (comma-separated)')
-    .action(async (name, url, options) => {
+    .action(async (name, url) => {
     try {
         await AddBookMarks(name, url);
     }
