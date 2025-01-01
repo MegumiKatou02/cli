@@ -1,6 +1,7 @@
 import sharp from 'sharp';
 import fs from 'fs';
 import path from 'path';
+import chalk from 'chalk';
 
 export async function resizeImage(
   input: string,
@@ -43,5 +44,33 @@ export async function resizeImage(
       .toFile(output);
   } catch (err) {
     throw new Error(`Error processing image: ${err}`);
+  }
+}
+
+export async function resizeImagesCommand(input: string, output: string, options: { width?: string; height?: string; quality?: string }) {
+  try {
+    if (!fs.existsSync(input)) {
+      throw new Error(`Input file not found: ${input}`);
+    }
+
+    const width = options.width ? parseInt(options.width) : undefined;
+    const height = options.height ? parseInt(options.height) : undefined;
+    const quality = options.quality ? parseInt(options.quality) : 75;
+
+    if (width !== undefined && isNaN(width)) {
+      throw new Error('Width must be a valid number.');
+    }
+    if (height !== undefined && isNaN(height)) {
+      throw new Error('Height must be a valid number.');
+    }
+    if (isNaN(quality) || quality < 0 || quality > 100) {
+      throw new Error('Quality must be a number between 0 and 100.');
+    }
+
+    await resizeImage(input, output, width, height, quality);
+    console.log(chalk.green(`Image saved to ${chalk.bold(output)}`));
+  } catch (err) {
+    const mess = err instanceof Error ? err.message : 'An unknown error occurred.';
+    console.error('Error:', chalk.red(mess));
   }
 }

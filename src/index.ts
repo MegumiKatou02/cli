@@ -2,6 +2,7 @@
 
 import fs, { promises as profs } from 'fs'
 import path from 'path';
+import chalk from 'chalk';
 import { Command } from 'commander';
 import { showVersion } from '../commands/version.js';
 import { qrCommand } from '../commands/qr.js'; 
@@ -13,11 +14,10 @@ import { countFilesAndFoldersDeep } from '../commands/countfiles/countfilesdeep.
 import { getWeatherCommand } from '../commands/getweather.js'
 import { monitorSystemCommand } from '../commands/monitorSystem.js';
 import { convertImageCommand } from '../commands/convertImage.js'
-import { resizeImage } from '../commands/imageresize.js'
+import { resizeImagesCommand } from '../commands/image/imageresize.js'
 import { readFile, saveFile } from "../utils/fileprocess.js";
 import { editFile } from "../commands/editFile.js";
 import readlineSync from "readline-sync";
-import simpleGit from 'simple-git';
 import packageJson from 'package-json';
 import { execSync } from 'child_process';
 import { listProcesses } from '../commands/system/listProccesses.js';
@@ -27,8 +27,12 @@ import { handleFindProcess } from '../commands/system/findProcess.js'
 import { getNetworkInfo } from '../commands/networkInfo.js'
 import { encryptFile } from '../commands/code/encrypt.js';
 import { decryptFile } from '../commands/code/decrypt.js';
-
-const git = simpleGit();
+import { ListBookMarks } from '../commands/bookmarks/listBookmarks.js'
+import { AddBookMarks } from '../commands/bookmarks/addBookmarks.js'
+import { searchCharacter } from '../commands/anime/searchCharacter.js'
+import { searchAnime } from '../commands/anime/searchAnime.js'
+import { createGIF } from '../commands/image/creategif.js'
+import * as git from '../commands/git/git.js'
 
 const program = new Command();
 
@@ -36,6 +40,55 @@ program
   .name('haiku')
   .description('A custom CLI tool for special tasks')
   .version(`${VERSION}`, '-v, --version', 'Show current version of Haiku CLI');
+
+program
+  .command('create-gif <inputFolder> <outputFile>')
+  .description('Create a GIF from multiple images in a folder')
+  .option('-d --delay <number>', 'Delay between frames in milliseconds', '100')
+  .option('-w --width <number>', 'Width of the GIF', '500')
+  .option('-h --height <number>', 'Height of the GIF', '500')
+  .action(async (inputFolder, outputFile, options) => {
+    try {
+      await createGIF(inputFolder, outputFile, {
+        delay: parseInt(options.delay),
+        width: parseInt(options.width),
+        height: parseInt(options.height),
+      });
+    } catch (error) {
+      console.error('Error creating GIF:', (error as Error).message);
+    } 
+  });
+
+program
+  .command('anime')
+  .option('-c, --character <name>', 'Search for an anime character')
+  .option('-a, --anime <title>', 'Search for an anime by title')
+  .description('Search for anime characters or shows')
+  .action((options) => {
+    try {
+      if (options.character) {
+        searchCharacter(options.character);
+      } else if (options.anime) {
+        searchAnime(options.anime);
+      } else {
+        console.log(chalk.yellow('Please provide a character name using --character or an anime title using --anime.'));
+      }
+    } catch (error) {
+      console.error('Error searching:', (error as Error).message);
+    }
+  });
+
+program
+  .command('add <name> <url>')
+  .description('Add a new bookmark')
+  .option('-t, --tags <tags>', 'Add tags to the bookmark (comma-separated)')
+  .action(async (name, url, options) => {
+    try {
+      await AddBookMarks(name, url);
+    } catch (error) {
+      console.error('Error adding bookmark:', (error as Error).message);
+    }
+  });
 
 program
   .command('encrypt <inputFile> <outputFile>')
@@ -65,8 +118,24 @@ program
 
 program
   .command('list')
+  .option('-p, --processes', 'List all running processes')
+  .option('-b, --bookmarks', 'List all bookmarks')
   .description('List all running processes')
-  .action(listProcesses);
+  .action(async (options) => {
+    try {
+      if(options.processes) {
+        await listProcesses();
+      }
+      if(options.bookmarks) {
+        await ListBookMarks();
+      }
+      if (!options.processes && !options.bookmarks) {
+        program.help();
+      }
+    } catch (error) {
+      console.log((error as Error).message);
+    }
+  });
 
 program
   .command('kill <pid>')
@@ -99,28 +168,9 @@ program
   .option('-q, --quality <number>', 'Output quality (0-100)', '75')
   .action(async (input: string, output: string, options: { width?: string; height?: string; quality?: string }) => {
     try {
-      if (!fs.existsSync(input)) {
-        throw new Error(`Input file not found: ${input}`);
-      }
-
-      const width = options.width ? parseInt(options.width) : undefined;
-      const height = options.height ? parseInt(options.height) : undefined;
-      const quality = options.quality ? parseInt(options.quality) : 75;
-
-      if (width !== undefined && isNaN(width)) {
-        throw new Error('Width must be a valid number.');
-      }
-      if (height !== undefined && isNaN(height)) {
-        throw new Error('Height must be a valid number.');
-      }
-      if (isNaN(quality) || quality < 0 || quality > 100) {
-        throw new Error('Quality must be a number between 0 and 100.');
-      }
-
-      await resizeImage(input, output, width, height, quality);
-      console.log(`Image saved to ${output}`);
-    } catch (err) {
-      console.error('Error:', err instanceof Error ? err.message : 'An unknown error occurred.');
+      await resizeImagesCommand(input, output, options);
+    } catch (error) {
+      console.log((error as Error).message)
     }
   });
 
@@ -208,79 +258,71 @@ program
 program
   .command('clone <repoUrl>')
   .description('Clone a GitHub repository into the current directory')
-  .action(async (repoUrl) => {
-    try {
-      console.log(`Cloning repository from ${repoUrl} into the current directory...`);
-      await git.clone(repoUrl);
-      console.log('Successfully cloned the repository into the current directory');
-    } catch (error) {
-      console.error('Error cloning the repository:', error);
+  .option('-g --git', 'use git')
+  .action(async (repoUrl, options) => {
+    if(!options.git) {
+      console.error('Please provide a git flag with -g or --git');
+      return;
     }
+    await git.Clone(repoUrl);
   });
 
+const branch = git.Branch;
+
 program
-  .command('branch [branchName]')
-  .description('Create, delete, or list Git branches')
-  .option('-d, --delete', 'Delete a branch')
-  .action(async (branchName, options) => {
-    try {
-      if (options.delete) {
-        console.log(`Deleting branch: ${branchName}...`);
-        await git.deleteLocalBranch(branchName);
-        console.log(`Branch ${branchName} deleted successfully.`);
-      } else if (branchName) {
-        console.log(`Creating branch: ${branchName}...`);
-        await git.checkoutLocalBranch(branchName);
-        console.log(`Branch ${branchName} created successfully.`);
-      } else {
-        console.log('Listing branches...');
-        const branches = await git.branch();
-        console.log(branches.all);
-      }
-    } catch (error) {
-      console.error('Error managing branches:', error);
-    }
-});
+  .command(branch.command)
+  .description(branch.description)
+  .option(branch.options[0].flag, branch.options[0].description)
+  .option(branch.options[1].flag, branch.options[1].description)
+  .option(branch.options[2].flag, branch.options[2].description) // flag git :v
+  .action(branch.action);
 
 program
   .command('push')
   .description('Push changes to the remote Git repository')
-  .action(async () => {
-    try {
-      console.log('Pushing changes to the remote repository...');
-      await git.push();
-      console.log('Changes pushed successfully.');
-    } catch (error) {
-      console.error('Error pushing changes:', error);
+  .option('-g --git', 'use git')
+  .action(async (options) => {
+    if(!options.git) {
+      console.error('Please provide a git flag with -g or --git');
+      return;
     }
+    await git.Push();
 });
 
 program
   .command('pull')
   .description('Pull changes from the remote Git repository')
-  .action(async () => {
-    try {
-      console.log('Pulling changes from the remote repository...');
-      await git.pull();
-      console.log('Changes pulled successfully.');
-    } catch (error) {
-      console.error('Error pulling changes:', error);
+  .option('-g --git', 'use git')
+  .action(async (options) => {
+    if(!options.git) {
+      console.error('Please provide a git flag with -g or --git');
+      return;
     }
+    await git.Pull();
 });
 
 program
   .command('log')
   .description('Show the commit history of the Git repository')
-  .action(async () => {
-    try {
-      console.log('Fetching commit history...');
-      const log = await git.log();
-      log.all.forEach(commit => {
-        console.log(`Commit: ${commit.hash} - ${commit.message}`);
-      });
-    } catch (error) {
-      console.error('Error fetching commit history:', error);
+  .option('-g --git', 'use git')
+  .action(async (options) => {
+    if(!options.git) {
+      console.error('Please provide a git flag with -g or --git');
+      return;
     }
+    await git.Log();
+  });
+
+program
+  .command('status')
+  .description('Show the working tree status')
+  .option('-g --git', 'use git')
+  .action(async (options) => {
+    if(!options.git) {
+      console.error('Please provide a git flag with -g or --git');
+      return;
+    }
+    await git.Status();
   });
 
   program
