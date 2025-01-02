@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as config from '../constants/config.js'
+import * as config from '../constants/Config.js'
 
 const apiKey = config.OPENWEATHERMAP_API_KEY
 

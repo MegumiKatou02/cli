@@ -1,4 +1,4 @@
-import { findProcessByName } from '../../utils/processUtils.js';
+import { findProcessByName } from '../../utils/ProcessUtils.js';
 
 export async function handleFindProcess(name: string, exactMatch: boolean = false, limit: number = 0) {
     const foundProcesses = await findProcessByName(name, exactMatch, limit);

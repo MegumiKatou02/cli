@@ -4,37 +4,39 @@ import fs, { promises as profs } from 'fs'
 import path from 'path';
 import chalk from 'chalk';
 import { Command } from 'commander';
-import { showVersion } from '../commands/version.js';
-import { qrCommand } from '../commands/qr.js'; 
-import { welcome } from '../commands/info.js';
-import { OptionPassword } from '../commands/password.js'
-import { VERSION } from '../constants/version.js';
-import { countFilesAndFoldersShallow } from '../commands/countfiles/countfiles.js'
-import { countFilesAndFoldersDeep } from '../commands/countfiles/countfilesdeep.js'
-import { getWeatherCommand } from '../commands/getweather.js'
-import { monitorSystemCommand } from '../commands/monitorSystem.js';
-import { convertImageCommand } from '../commands/convertImage.js'
-import { resizeImagesCommand } from '../commands/image/imageresize.js'
-import { readFile, saveFile } from "../utils/fileprocess.js";
-import { editFile } from "../commands/editFile.js";
+import { showVersion } from '../commands/Version.js';
+import { qrCommand } from '../commands/QR.js'; 
+import { welcome } from '../commands/Info.js';
+import { OptionPassword } from '../commands/Password.js'
+import { VERSION } from '../constants/Version.js';
+import { countFilesAndFoldersShallow } from '../commands/files/Countfiles.js'
+import { countFilesAndFoldersDeep } from '../commands/files/Countfilesdeep.js'
+import { getWeatherCommand } from '../commands/Getweather.js'
+import { monitorSystemCommand } from '../commands/system/MonitorSystem.js';
+import { convertImageCommand } from '../commands/image/ConvertImage.js'
+import { resizeImagesCommand } from '../commands/image/ImageResize.js'
+import { readFile, saveFile } from "../utils/FileProcess.js";
+import { editFile } from "../commands/files/EditFile.js";
 import readlineSync from "readline-sync";
 import packageJson from 'package-json';
 import { execSync } from 'child_process';
-import { listProcesses } from '../commands/system/listProccesses.js';
-import { killProcess } from '../commands/system/killProcess.js';
-import { monitorProcess } from '../utils/processUtils.js';
-import { handleFindProcess } from '../commands/system/findProcess.js'
-import { getNetworkInfo } from '../commands/networkInfo.js'
-import { encryptFile } from '../commands/code/encrypt.js';
-import { decryptFile } from '../commands/code/decrypt.js';
-import { ListBookMarks } from '../commands/bookmarks/listBookmarks.js'
-import { AddBookMarks } from '../commands/bookmarks/addBookmarks.js'
-import { searchCharacter } from '../commands/anime/searchCharacter.js'
-import { searchAnime } from '../commands/anime/searchAnime.js'
-import { createGIF } from '../commands/image/creategif.js'
-import * as git from '../commands/git/git.js'
+import { listProcesses } from '../commands/system/ListProccesses.js';
+import { killProcess } from '../commands/system/KillProcess.js';
+import { monitorProcess } from '../utils/ProcessUtils.js';
+import { handleFindProcess } from '../commands/system/FindProcess.js'
+import { getNetworkInfo } from '../commands/system/NetworkInfo.js'
+import { encryptFile } from '../commands/code/Encrypt.js';
+import { decryptFile } from '../commands/code/Decrypt.js';
+import { ListBookMarks } from '../commands/bookmarks/ListBookmarks.js'
+import { AddBookMarks } from '../commands/bookmarks/AddBookmarks.js'
+import { searchCharacter } from '../commands/anime/SearchCharacter.js'
+import { searchAnime } from '../commands/anime/SearchAnime.js'
+import { createGIF } from '../commands/image/CreateGif.js'
+import * as git from '../commands/git/Git.js'
 import { TruyenDexImageDownloader } from '../public/manga/MangaDexAPI.js'
 import { LightNovelDownloader } from '../public/lightnovel/LightNovel.js'
+import * as themes from '../commands/Theme.js'
+import * as manga from '../commands/manga/Manga.js'
 
 const program = new Command();
 
@@ -45,13 +47,62 @@ program
 
 program
   .command('manga')
-  .description('Download manga from MangaDex or TruyenDex')
-  .requiredOption('-u, --url <url>', 'URL of the manga to download')
+  .description('manga')
+  .option('-u, --url <url>', 'URL of the manga to download')
   .option('-p, --platform <platform>', 'Platform to download from (MangaDex or TruyenDex)', 'MangaDex')
+  .option('-s --search <name>', 'Search a manga')
+  .option('-i, --include-tags <tags>', 'Include manga with specific tags (comma-separated)')
+  .option('-e, --exclude-tags <tags>', 'Exclude manga with specific tags (comma-separated)')
+  .option('-l, --limit <number>', 'Limit the number of results displayed', parseInt) 
   .action(async (options) => {
-      const downloader = new TruyenDexImageDownloader((message) => console.log(message));
-      downloader.setupTitle(options.platform);
-      await downloader.downloadManga(options.url);
+    try {
+      console.log(options);
+      if (!options.url && !options.search && !options.includeTags && !options.excludeTags) {
+        console.log(chalk.yellow('Please provide at least one option.'));
+        console.log(chalk.whiteBright('Usage:'));
+        console.log(chalk.whiteBright(`  --url with --platform`));
+        console.log(chalk.whiteBright(`  --search with --limit`));
+        console.log(chalk.whiteBright(`  --include-tags with --exclude-tags with --limit`));
+        return;
+      }
+
+      if(options.url) {
+        const downloader = new TruyenDexImageDownloader((message) => console.log(message));
+        downloader.setupTitle(options.platform);
+        await downloader.downloadManga(options.url);
+      }
+      else if(options.search) {
+        const results = await manga.searchOnlyManga(options.search);
+        const limit = options.limit || results.length; 
+        manga.displayMangaResults(results.slice(0, limit));
+      }
+      else if(options.includeTags || options.excludeTags) {
+        const includedTags = options.includeTags
+                ? await manga.getTagIDs(options.includeTags.split(','))
+                : undefined;
+
+        const excludedTags = options.excludeTags
+            ? await manga.getTagIDs(options.excludeTags.split(','))
+            : undefined;
+
+        const results = await manga.searchManga({
+          title: options.title,
+          includedTags,
+          excludedTags,
+        });
+
+        const limit = options.limit || results.length; 
+        manga.displayMangaResults(results.slice(0, limit));
+      }
+      else {
+        console.log(chalk.whiteBright('Usage:'));
+        console.log(chalk.whiteBright(`  --url with --platform`));
+        console.log(chalk.whiteBright(`  --search with --limit`));
+        console.log(chalk.whiteBright(`  --include-tags with --exclude-tags with --limit`));
+      }
+    } catch(error) {
+      console.error('Error:', (error as Error).message);
+    }
   });
 
 program
@@ -99,6 +150,36 @@ program
       }
     } catch (error) {
       console.error('Error searching:', (error as Error).message);
+    }
+  });
+
+program
+  .command('theme')
+  .description('Configure themes for the CLI')
+  .option('--init', 'Initialize the themes directory')
+  .option('-i --install <themeName>', 'Install a theme')
+  .option('-l --list', 'List all installed themes')
+  .option('-a --apply <themeName>', 'Apply a theme')
+  .option('-d --delete <themeName>', 'Delete a theme')
+  .action((options, themeName) => {
+    try {
+      if(options.init) {
+        themes.initThemesDir();
+      }
+      if(options.install) {
+        themes.installTheme(themeName);
+      }
+      if(options.list) {
+        themes.listThemes();
+      }
+      if(options.apply) {
+        themes.applyTheme(themeName);
+      }
+      if(options.delete) {
+        themes.deleteTheme(themeName);
+      }
+    } catch(error) {
+      console.error('Error:', (error as Error).message);
     }
   });
 

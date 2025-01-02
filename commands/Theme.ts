@@ -1,17 +1,16 @@
-import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
 
 const THEMES_DIR = path.join(process.cwd(), 'themes');
 
-function initThemesDir() {
+export function initThemesDir() {
     if (!fs.existsSync(THEMES_DIR)) {
         fs.mkdirSync(THEMES_DIR);
         console.log(`Created '${THEMES_DIR}' directory.`);
     }
 }
 
-function installTheme(themeName: string) {
+export function installTheme(themeName: string) {
     const themePath = path.join(THEMES_DIR, themeName);
     if (fs.existsSync(themePath)) {
         console.log(`Theme '${themeName}' already exists.`);
@@ -21,7 +20,7 @@ function installTheme(themeName: string) {
     }
 }
 
-function listThemes() {
+export function listThemes() {
     if (!fs.existsSync(THEMES_DIR)) {
         console.log('No themes installed.');
     } else {
@@ -35,7 +34,7 @@ function listThemes() {
     }
 }
 
-function applyTheme(themeName: string) {
+export function applyTheme(themeName: string) {
     const themePath = path.join(THEMES_DIR, themeName);
     if (fs.existsSync(themePath)) {
         console.log(`Theme '${themeName}' applied successfully.`);
@@ -44,7 +43,7 @@ function applyTheme(themeName: string) {
     }
 }
 
-function deleteTheme(themeName: string) {
+export function deleteTheme(themeName: string) {
     const themePath = path.join(THEMES_DIR, themeName);
     if (fs.existsSync(themePath)) {
         fs.rmdirSync(themePath, { recursive: true });

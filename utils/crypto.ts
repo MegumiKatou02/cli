@@ -1,7 +1,8 @@
 import { createCipheriv, createDecipheriv } from 'crypto';
+import { ENCRYPTION_KEY, ENCRYPTION_IV } from '../constants/Config.js';
 
-const key = Buffer.from('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', 'hex');
-const iv = Buffer.from('0123456789abcdef0123456789abcdef', 'hex');
+const key = Buffer.from(ENCRYPTION_KEY, 'hex');
+const iv = Buffer.from(ENCRYPTION_IV, 'hex');
 
 export function encrypt(data: Buffer): Buffer {
   const cipher = createCipheriv('aes-256-cbc', key, iv);

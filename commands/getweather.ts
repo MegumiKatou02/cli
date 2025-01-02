@@ -1,4 +1,4 @@
-import { getWeather } from '../services/weatherservice.js';
+import { getWeather } from '../services/WeatherService.js';
 
 export const getWeatherCommand = {
   command: 'weather',

@@ -1,6 +1,6 @@
 {
   "name": "@yukiookii/haiku",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "src/index.ts",
   "type": "module",
   "bin": {
@@ -27,13 +27,10 @@
     "chalk": "^5.4.0",
     "chalk-animation": "^2.0.3",
     "cheerio": "^1.0.0",
-    "child_process": "^1.0.2",
     "clear": "^0.1.0",
     "commander": "^12.1.0",
-    "crypto": "^1.0.1",
     "figlet": "^1.8.0",
     "gradient-string": "^3.0.0",
-    "image-type": "^5.2.0",
     "inquirer": "^12.2.0",
     "nanospinner": "^1.2.2",
     "package-json": "^10.0.1",

@@ -1,5 +1,5 @@
 import { createReadStream, createWriteStream } from 'fs';
-import { decrypt } from '../../utils/crypto.js';
+import { decrypt } from '../../utils/Crypto.js';
 
 export function decryptFile(inputFile: string, outputFile: string): void {
   const input = createReadStream(inputFile);

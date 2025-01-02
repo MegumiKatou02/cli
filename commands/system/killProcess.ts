@@ -1,5 +1,5 @@
 import { exec } from 'child_process';
-import { isProcessRunning } from '../../utils/processUtils.js';
+import { isProcessRunning } from '../../utils/ProcessUtils.js';
 
 export async function killProcess(pid: number) {
     const isRunning = await isProcessRunning(pid);

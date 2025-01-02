@@ -1,5 +1,5 @@
 import { createReadStream, createWriteStream } from 'fs';
-import { encrypt } from '../../utils/crypto.js';
+import { encrypt } from '../../utils/Crypto.js';
 
 export function encryptFile(inputFile: string, outputFile: string): void {
   const input = createReadStream(inputFile);
