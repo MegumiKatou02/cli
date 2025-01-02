@@ -244,7 +244,7 @@ program
 
 program
   .command("count <path>")
-  .option("--d", "Recursively count files and folders in subdirectories")
+  .option("-d --deep", "Recursively count files and folders in subdirectories")
   .description("Count files and folders in a directory")
   .action(async (path, options) => {
     try {

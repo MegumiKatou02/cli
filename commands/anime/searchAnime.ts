@@ -1,7 +1,8 @@
 import axios from 'axios';
 import chalk from 'chalk';
+import * as URLs from '../../constants/URLs.js';
 
-const API_URL = 'https://graphql.anilist.co';
+const API_URL = URLs.API_URL_ANILIST;
 
 const SEARCH_ANIME_QUERY = `
   query ($title: String) {
