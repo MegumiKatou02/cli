@@ -15,6 +15,15 @@
       },
       "resolveJsonModule": true
     },
-    "include": ["src/**/*", "commands/**/*", "constants/**/*", "utils/**/*", "services/**/*", "types/**/*", "public/**/*"],
+    "include": [
+      "src/**/*", 
+      "commands/**/*", 
+      "constants/**/*", 
+      "utils/**/*", 
+      "services/**/*", 
+      "types/**/*", 
+      "public/**/*",
+      "test/**/*"
+    ],
     "exclude": ["node_modules", "**/*.spec.ts"]
   }

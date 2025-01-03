@@ -37,6 +37,8 @@ import { TruyenDexImageDownloader } from '../public/manga/MangaDexAPI.js'
 import { LightNovelDownloader } from '../public/lightnovel/LightNovel.js'
 import * as themes from '../commands/Theme.js'
 import * as manga from '../commands/manga/Manga.js'
+import { convertToPdfCommand } from '../commands/convert/ConvertToPdf.js'
+import { animeManager } from '../commands/anime/list/ListCommand.js'
 
 const program = new Command();
 
@@ -44,6 +46,8 @@ program
   .name('haiku')
   .description('A custom CLI tool for special tasks')
   .version(`${VERSION}`, '-v, --version', 'Show current version of Haiku CLI');
+
+program.addCommand(animeManager);
 
 program
   .command('manga')
@@ -279,6 +283,8 @@ program
   });
 
 program.addCommand(convertImageCommand);
+
+program.addCommand(convertToPdfCommand);
 
 program
   .command(getWeatherCommand.command) // thu cach viet moi :3

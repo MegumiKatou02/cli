@@ -5,3 +5,5 @@ test/
 .env
 
 constants/config.ts
+
+test/

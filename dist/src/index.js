@@ -36,11 +36,14 @@ import { TruyenDexImageDownloader } from '../public/manga/MangaDexAPI.js';
 import { LightNovelDownloader } from '../public/lightnovel/LightNovel.js';
 import * as themes from '../commands/Theme.js';
 import * as manga from '../commands/manga/Manga.js';
+import { convertToPdfCommand } from '../commands/convert/ConvertToPdf.js';
+import { animeManager } from '../commands/anime/list/ListCommand.js';
 const program = new Command();
 program
     .name('haiku')
     .description('A custom CLI tool for special tasks')
     .version(`${VERSION}`, '-v, --version', 'Show current version of Haiku CLI');
+program.addCommand(animeManager);
 program
     .command('manga')
     .description('manga')
@@ -53,6 +56,14 @@ program
     .action(async (options) => {
     try {
         console.log(options);
+        if (!options.url && !options.search && !options.includeTags && !options.excludeTags) {
+            console.log(chalk.yellow('Please provide at least one option.'));
+            console.log(chalk.whiteBright('Usage:'));
+            console.log(chalk.whiteBright(`  --url with --platform`));
+            console.log(chalk.whiteBright(`  --search with --limit`));
+            console.log(chalk.whiteBright(`  --include-tags with --exclude-tags with --limit`));
+            return;
+        }
         if (options.url) {
             const downloader = new TruyenDexImageDownloader((message) => console.log(message));
             downloader.setupTitle(options.platform);
@@ -79,6 +90,10 @@ program
             manga.displayMangaResults(results.slice(0, limit));
         }
         else {
+            console.log(chalk.whiteBright('Usage:'));
+            console.log(chalk.whiteBright(`  --url with --platform`));
+            console.log(chalk.whiteBright(`  --search with --limit`));
+            console.log(chalk.whiteBright(`  --include-tags with --exclude-tags with --limit`));
         }
     }
     catch (error) {
@@ -254,6 +269,7 @@ program
     }
 });
 program.addCommand(convertImageCommand);
+program.addCommand(convertToPdfCommand);
 program
     .command(getWeatherCommand.command) // thu cach viet moi :3
     .description(getWeatherCommand.description)
