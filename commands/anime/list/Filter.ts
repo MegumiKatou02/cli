@@ -1,6 +1,5 @@
-import { Command } from 'commander';
 import { Anime } from './Anime.js';
-import { readAnimeList } from '../../../utils/AnimeUtils.js';
+import { readAnimeList, PrintAnimeList } from '../../../utils/AnimeUtils.js';
 
 export const AnimeFilter = (path: string, finished: boolean, unfinished: boolean) => {
   const animeList = readAnimeList(path);
@@ -14,5 +13,5 @@ export const AnimeFilter = (path: string, finished: boolean, unfinished: boolean
     filteredList = animeList;
   }
 
-  console.log(filteredList);
+  PrintAnimeList(filteredList);
 }

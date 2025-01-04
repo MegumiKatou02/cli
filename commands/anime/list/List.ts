@@ -1,6 +1,7 @@
-import { readAnimeList } from '../../../utils/AnimeUtils.js';
+import { readAnimeList, PrintAnimeList } from '../../../utils/AnimeUtils.js';
 
 export const AnimeList = (path: string) => {
     const animeList = readAnimeList(path);
-    console.log(animeList);
+
+    PrintAnimeList(animeList);
 }

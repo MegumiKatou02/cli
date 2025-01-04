@@ -33,12 +33,11 @@ import { searchCharacter } from '../commands/anime/SearchCharacter.js'
 import { searchAnime } from '../commands/anime/SearchAnime.js'
 import { createGIF } from '../commands/image/CreateGif.js'
 import * as git from '../commands/git/Git.js'
-import { TruyenDexImageDownloader } from '../public/manga/MangaDexAPI.js'
 import { LightNovelDownloader } from '../public/lightnovel/LightNovel.js'
 import * as themes from '../commands/Theme.js'
-import * as manga from '../commands/manga/Manga.js'
 import { convertToPdfCommand } from '../commands/convert/ConvertToPdf.js'
 import { animeManager } from '../commands/anime/list/ListCommand.js'
+import { mangaCommand } from '../commands/manga/MangaCommand.js';
 
 const program = new Command();
 
@@ -49,65 +48,7 @@ program
 
 program.addCommand(animeManager);
 
-program
-  .command('manga')
-  .description('manga')
-  .option('-u, --url <url>', 'URL of the manga to download')
-  .option('-p, --platform <platform>', 'Platform to download from (MangaDex or TruyenDex)', 'MangaDex')
-  .option('-s --search <name>', 'Search a manga')
-  .option('-i, --include-tags <tags>', 'Include manga with specific tags (comma-separated)')
-  .option('-e, --exclude-tags <tags>', 'Exclude manga with specific tags (comma-separated)')
-  .option('-l, --limit <number>', 'Limit the number of results displayed', parseInt) 
-  .action(async (options) => {
-    try {
-      console.log(options);
-      if (!options.url && !options.search && !options.includeTags && !options.excludeTags) {
-        console.log(chalk.yellow('Please provide at least one option.'));
-        console.log(chalk.whiteBright('Usage:'));
-        console.log(chalk.whiteBright(`  --url with --platform`));
-        console.log(chalk.whiteBright(`  --search with --limit`));
-        console.log(chalk.whiteBright(`  --include-tags with --exclude-tags with --limit`));
-        return;
-      }
-
-      if(options.url) {
-        const downloader = new TruyenDexImageDownloader((message) => console.log(message));
-        downloader.setupTitle(options.platform);
-        await downloader.downloadManga(options.url);
-      }
-      else if(options.search) {
-        const results = await manga.searchOnlyManga(options.search);
-        const limit = options.limit || results.length; 
-        manga.displayMangaResults(results.slice(0, limit));
-      }
-      else if(options.includeTags || options.excludeTags) {
-        const includedTags = options.includeTags
-                ? await manga.getTagIDs(options.includeTags.split(','))
-                : undefined;
-
-        const excludedTags = options.excludeTags
-            ? await manga.getTagIDs(options.excludeTags.split(','))
-            : undefined;
-
-        const results = await manga.searchManga({
-          title: options.title,
-          includedTags,
-          excludedTags,
-        });
-
-        const limit = options.limit || results.length; 
-        manga.displayMangaResults(results.slice(0, limit));
-      }
-      else {
-        console.log(chalk.whiteBright('Usage:'));
-        console.log(chalk.whiteBright(`  --url with --platform`));
-        console.log(chalk.whiteBright(`  --search with --limit`));
-        console.log(chalk.whiteBright(`  --include-tags with --exclude-tags with --limit`));
-      }
-    } catch(error) {
-      console.error('Error:', (error as Error).message);
-    }
-  });
+program.addCommand(mangaCommand);
 
 program
   .command('ln')

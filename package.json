@@ -1,6 +1,6 @@
 {
   "name": "@yukiookii/haiku",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "main": "src/index.ts",
   "type": "module",
   "bin": {
@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "axios": "^1.7.9",
-    "chalk": "^5.4.0",
+    "chalk": "^5.4.1",
     "chalk-animation": "^2.0.3",
     "cheerio": "^1.0.0",
     "clear": "^0.1.0",

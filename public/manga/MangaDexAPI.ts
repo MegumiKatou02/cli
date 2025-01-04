@@ -8,6 +8,13 @@ export class TruyenDexImageDownloader {
     constructor(private logger: (message: string) => void) {}
 
     public setupTitle(option: string): void {
+        if(option.toLowerCase() === "mangadex") {
+            option = "MangaDex";
+        }
+        else if(option.toLowerCase() === "truyendex") {
+            option = "TruyenDex";
+        }
+
         if (option === "MangaDex") {
             this.title = "title";
         } else if (option === "TruyenDex") {
@@ -52,7 +59,7 @@ export class TruyenDexImageDownloader {
         }
     }
 
-    public async downloadManga(mangaUrl: string): Promise<void> {
+    public async downloadManga(mangaUrl: string, chaptersToDownload?: string): Promise<void> {
         const mangaIdMatch = mangaUrl.match(new RegExp(`/${this.title}/([a-f0-9\\-]+)`));
         if (!mangaIdMatch) {
             this.logger("Invalid manga URL.");
@@ -75,19 +82,36 @@ export class TruyenDexImageDownloader {
             return;
         }
 
-        for (const { volume, chapter, chapterId } of chapters) {
-            this.logger(`Downloading volume ${volume}, chapter ${chapter}...`);
-
-            const images = await this.fetchImages(chapterId);
-            if (images.length > 0) {
-                const chapterFolder = path.join(mangaFolder, `volume_${volume}`, `chapter_${chapter}`);
-                fs.mkdirSync(chapterFolder, { recursive: true });
-
-                for (const imageUrl of images) {
-                    await this.downloadImage(imageUrl, chapterFolder);
+        const chaptersToDownloadSet = new Set<string>();
+        if (chaptersToDownload) {
+            const ranges = chaptersToDownload.split(',');
+            for (const range of ranges) {
+                if (range.includes('-')) {
+                    const [start, end] = range.split('-').map(Number);
+                    for (let i = start; i <= end; i++) {
+                        chaptersToDownloadSet.add(i.toString());
+                    }
+                } else {
+                    chaptersToDownloadSet.add(range);
                 }
-            } else {
-                this.logger(`No images found for chapter ${chapter}.`);
+            }
+        }
+
+        for (const { volume, chapter, chapterId } of chapters) {
+            if (chaptersToDownloadSet.size === 0 || chaptersToDownloadSet.has(chapter)) {
+                this.logger(`Downloading volume ${volume}, chapter ${chapter}...`);
+
+                const images = await this.fetchImages(chapterId);
+                if (images.length > 0) {
+                    const chapterFolder = path.join(mangaFolder, `volume_${volume}`, `chapter_${chapter}`);
+                    fs.mkdirSync(chapterFolder, { recursive: true });
+
+                    for (const imageUrl of images) {
+                        await this.downloadImage(imageUrl, chapterFolder);
+                    }
+                } else {
+                    this.logger(`No images found for chapter ${chapter}.`);
+                }
             }
         }
 
