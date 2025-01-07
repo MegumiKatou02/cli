@@ -37,7 +37,9 @@ import * as themes from '../commands/Theme.js';
 import { convertToPdfCommand } from '../commands/convert/ConvertToPdf.js';
 import { animeManager } from '../commands/anime/list/ListCommand.js';
 import { mangaCommand } from '../commands/manga/MangaCommand.js';
-import { pinterestCommand } from '../commands/pinterest/Pinterest.js';
+import * as utils from '../utils/Utils.js';
+import { getKanji } from '../commands/kanji/KanjiCommand.js';
+import { KanjiStyle } from '../commands/kanji/Kanji.js';
 const program = new Command();
 program
     .name('haiku')
@@ -45,7 +47,6 @@ program
     .version(`${VERSION}`, '-v, --version', 'Show current version of Haiku CLI');
 program.addCommand(animeManager);
 program.addCommand(mangaCommand);
-program.addCommand(pinterestCommand);
 program
     .command('ln')
     .description('Download light novels to txt files')
@@ -55,6 +56,34 @@ program
     const downloader = new LightNovelDownloader((message) => console.log(message));
     downloader.setupDomain(options.domain);
     await downloader.downloadLightNovel(options.url);
+});
+const kanjiCommand = program
+    .command('kanji')
+    .description('Retrieve information about Kanji characters, readings, and related words')
+    .option('-k --kanji <word>', 'Provides general information about the supplied kanji character')
+    .option('-r --reading <word>', 'Provides lists of kanji associated with the supplied reading')
+    .option('-w --words <word>', 'Provides a list of dictionary entries associated with the supplied kanji character')
+    .action(async (options) => {
+    const selectedOptions = Object.entries(options)
+        .filter(([_, value]) => value !== undefined)
+        .map(([key]) => key);
+    if (selectedOptions.length > 1) {
+        console.error(chalk.red(`Error, only select one option: ${selectedOptions.join(', ')}`));
+        process.exit(1);
+    }
+    if (selectedOptions.length === 0) {
+        kanjiCommand.outputHelp();
+        process.exit(1);
+    }
+    const KanjiStyleMap = {
+        kanji: KanjiStyle.KANJI,
+        reading: KanjiStyle.READING,
+        words: KanjiStyle.WORDS,
+    };
+    const optionType = Object.keys(options).find(key => options[key] !== undefined);
+    if (optionType) {
+        await getKanji(options[optionType], KanjiStyleMap[optionType]);
+    }
 });
 program
     .command('create-gif <inputFolder> <outputFile>')
@@ -376,15 +405,15 @@ program
         });
         if (results.length > 0) {
             results.forEach(file => {
-                console.log(`${file.isDirectory() ? '📁' : '📄'} ${path.join(searchDir, file.name)}`);
+                console.log(`${utils.getFolderAndFileSymbol(file.isDirectory())} ${path.join(searchDir, file.name)}`);
             });
         }
         else {
-            console.log('No results found.');
+            console.log(chalk.red('No results found'));
         }
     }
     catch (error) {
-        console.error('Error searching:', error);
+        console.error(chalk.red('Error searching:', error.message));
     }
 });
 program

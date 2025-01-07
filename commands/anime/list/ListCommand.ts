@@ -7,6 +7,13 @@ import { AnimeDelete } from './Delete.js'
 
 import { Command } from 'commander';
 
+const checkPath = (path: string): string => {
+  if(path.trim() === '.') {
+    return process.cwd() + '/anime.json';
+  }
+  return path;
+}
+
 const animeManager = new Command('anime-manager')
   .description('Manage your anime list')
   .requiredOption('-f, --file <file>', 'Path to anime.json');
@@ -16,7 +23,7 @@ animeManager
   .description('List all anime')
   .action(() => {
     const parentOptions = animeManager.opts();
-    AnimeList(parentOptions.file);
+    AnimeList(checkPath(parentOptions.file));
   });
 
 animeManager
@@ -26,7 +33,7 @@ animeManager
   .option('--unfinished', 'Filter unfinished anime')
   .action((options, command) => {
     const parentOptions = command.parent.opts();
-    AnimeFilter(parentOptions.file, options.finished, options.unfinished);
+    AnimeFilter(checkPath(parentOptions.file), options.finished, options.unfinished);
   });
 
 animeManager
@@ -36,7 +43,7 @@ animeManager
   .option('--id <id>', 'Search by id')
   .action((options, command) => {
     const parentOptions = command.parent.opts();
-    AnimeSearch(parentOptions.file, options.name, options.id);
+    AnimeSearch(checkPath(parentOptions.file), options.name, options.id);
   });
 
 animeManager
@@ -47,7 +54,7 @@ animeManager
   .option('--finished <finished>', 'Mark anime as finished (true/false)')
   .action((options, command) => {
     const parentOptions = command.parent.opts();
-    AnimeUpdate(parentOptions.file, options.id, options.episode, options.finished);
+    AnimeUpdate(checkPath(parentOptions.file), options.id, options.episode, options.finished);
   });
 
   animeManager
@@ -58,7 +65,7 @@ animeManager
   .option('--finished <finished>', 'Mark anime as finished (true/false)', 'false')
   .action((options, command) => {
     const parentOptions = command.parent.opts();
-    AnimeAdd(parentOptions.file, options.name, options.episode, options.finished);
+    AnimeAdd(checkPath(parentOptions.file), options.name, options.episode, options.finished);
   });
 
 animeManager
@@ -67,7 +74,7 @@ animeManager
   .requiredOption('--id <id>', 'ID of the anime to delete')
   .action((options, command) => {
     const parentOptions = command.parent.opts();
-    AnimeDelete(parentOptions.file, options.id);
+    AnimeDelete(checkPath(parentOptions.file), options.id);
   });
 
 export { animeManager };
