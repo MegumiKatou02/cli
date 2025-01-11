@@ -4,44 +4,44 @@ import { promises as profs } from 'fs'
 import path from 'path';
 import chalk from 'chalk';
 import { Command } from 'commander';
-import { showVersion } from '../commands/Version.js';
-import { qrCommand } from '../commands/QR.js'; 
-import { welcome } from '../commands/Info.js';
-import { OptionPassword } from '../commands/Password.js'
-import { VERSION } from '../constants/Version.js';
-import { countFilesAndFoldersShallow } from '../commands/files/Countfiles.js'
-import { countFilesAndFoldersDeep } from '../commands/files/Countfilesdeep.js'
-import { getWeatherCommand } from '../commands/Getweather.js'
-import { monitorSystemCommand } from '../commands/system/MonitorSystem.js';
-import { convertImageCommand } from '../commands/image/ConvertImage.js'
-import { resizeImagesCommand } from '../commands/image/ImageResize.js'
-import { readFile, saveFile } from "../utils/FileProcess.js";
-import { editFile } from "../commands/files/EditFile.js";
+import { showVersion } from './commands/Version.js'
+import { qrCommand } from './commands/QR.js'; 
+import { welcome } from './commands/Info.js';
+import { OptionPassword } from './commands/Password.js'
+import { VERSION } from './constants/Version.js';
+import { countFilesAndFoldersShallow } from './commands/files/Countfiles.js'
+import { countFilesAndFoldersDeep } from './commands/files/Countfilesdeep.js'
+import { getWeatherCommand } from './commands/Getweather.js'
+import { monitorSystemCommand } from './commands/system/MonitorSystem.js';
+import { convertImageCommand } from './commands/image/ConvertImage.js'
+import { resizeImagesCommand } from './commands/image/ImageResize.js'
+import { readFile, saveFile } from "./utils/FileProcess.js";
+import { editFile } from "./commands/files/EditFile.js";
 import readlineSync from "readline-sync";
 import packageJson from 'package-json';
 import { execSync } from 'child_process';
-import { listProcesses } from '../commands/system/ListProccesses.js';
-import { killProcess } from '../commands/system/KillProcess.js';
-import { monitorProcess } from '../utils/ProcessUtils.js';
-import { handleFindProcess } from '../commands/system/FindProcess.js'
-import { getNetworkInfo } from '../commands/system/NetworkInfo.js'
-import { encryptFile } from '../commands/code/Encrypt.js';
-import { decryptFile } from '../commands/code/Decrypt.js';
-import { ListBookMarks } from '../commands/bookmarks/ListBookmarks.js'
-import { AddBookMarks } from '../commands/bookmarks/AddBookmarks.js'
-import { searchCharacter } from '../commands/anime/SearchCharacter.js'
-import { searchAnime } from '../commands/anime/SearchAnime.js'
-import { createGIF } from '../commands/image/CreateGif.js'
-import * as git from '../commands/git/Git.js'
-import { LightNovelDownloader } from '../public/lightnovel/LightNovel.js'
-import * as themes from '../commands/Theme.js'
-import { convertToPdfCommand } from '../commands/convert/ConvertToPdf.js'
-import { animeManager } from '../commands/anime/list/ListCommand.js'
-import { mangaCommand } from '../commands/manga/MangaCommand.js';
-import * as utils from '../utils/Utils.js'
-import { getKanji } from '../commands/kanji/KanjiCommand.js';
-import { KanjiStyle } from '../commands/kanji/Kanji.js';
-import { isValidWord, suggestionWord } from '../commands/dictionary/Vietnamese.js';
+import { listProcesses } from './commands/system/ListProccesses.js';
+import { killProcess } from './commands/system/KillProcess.js';
+import { monitorProcess } from './utils/ProcessUtils.js';
+import { handleFindProcess } from './commands/system/FindProcess.js'
+import { getNetworkInfo } from './commands/system/NetworkInfo.js'
+import { encryptFile } from './commands/code/Encrypt.js';
+import { decryptFile } from './commands/code/Decrypt.js';
+import { ListBookMarks } from './commands/bookmarks/ListBookmarks.js'
+import { AddBookMarks } from './commands/bookmarks/AddBookmarks.js'
+import { searchCharacter } from './commands/anime/SearchCharacter.js'
+import { searchAnime } from './commands/anime/SearchAnime.js'
+import { createGIF } from './commands/image/CreateGif.js'
+import * as git from './commands/git/Git.js'
+import { LightNovelDownloader } from './public/lightnovel/LightNovel.js'
+import * as themes from './commands/Theme.js'
+import { convertToPdfCommand } from './commands/convert/ConvertToPdf.js'
+import { animeManager } from './commands/anime/list/ListCommand.js'
+import { mangaCommand } from './commands/manga/MangaCommand.js';
+import * as utils from './utils/Utils.js'
+import { getKanji } from './commands/kanji/KanjiCommand.js';
+import { KanjiStyle } from './commands/kanji/Kanji.js';
+import { isValidWord, suggestionWord } from './commands/dictionary/Vietnamese.js';
 
 const program = new Command();
 
