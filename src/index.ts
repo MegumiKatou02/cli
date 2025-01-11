@@ -41,7 +41,7 @@ import { mangaCommand } from '../commands/manga/MangaCommand.js';
 import * as utils from '../utils/Utils.js'
 import { getKanji } from '../commands/kanji/KanjiCommand.js';
 import { KanjiStyle } from '../commands/kanji/Kanji.js';
-import { isValidWord } from '../commands/dictionary/Vietnamese.js';
+import { isValidWord, suggestionWord } from '../commands/dictionary/Vietnamese.js';
 
 const program = new Command();
 
@@ -105,17 +105,14 @@ program
   .command('dict')
   .description('Check if a word exists in the Vietnamese dictionary')
   .argument('<word>', 'The word to check in the dictionary')
-  .action(async (word) => {
-    const data = await isValidWord(word);
-    if(data != null) {
-      if(data) {
-        console.log(chalk.green(`${word} is in the dictionary`));
-      }
-      else {
-        console.log(chalk.yellow(`${word} is not in the dictionary`));
-      }
+  .option('-s --suggestion')
+  .action(async (word, options) => {
+    if (options.suggestion) { // key: suggestions
+      await suggestionWord(word);
     }
-    else console.log(chalk.red('Invalid data or API error'));
+    else {
+      await isValidWord(word);
+    }
   });
 
 program
