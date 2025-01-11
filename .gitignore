@@ -2,8 +2,8 @@ dist/
 
 node_modules/
 
-.env
+src/constants/Config.ts
 
-constants/config.ts
+.env
 
 test/*
