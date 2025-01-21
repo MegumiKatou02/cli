@@ -1,28 +1,29 @@
 {
     "compilerOptions": {
-      "typeRoots": ["./node_modules/@types", "./src/types"],
-      "target": "ES2022",
-      "module": "Node16",
-      "moduleResolution": "node16",
+      "typeRoots": ["./node_modules/@types", "./types"],
+      "target": "ESNext",
+      "module": "ESNext",
+      "moduleResolution": "node",
       "strict": true,
       "esModuleInterop": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
-      "outDir": "dist",
-      "rootDir": "src",
+      "outDir": "./dist",
       "paths": {
         "@/*": ["./src/*"],
-        "@commands/*": ["./src/commands/*"]
+        "@config/*": ["./*"]
       },
       "resolveJsonModule": true
     },
     "include": [
       "src/**/*", 
+      "commands/**/*", 
+      "constants/**/*", 
+      "utils/**/*", 
+      "services/**/*", 
+      "types/**/*", 
+      "public/**/*",
       "test/**/*"
     ],
-    "exclude": [
-      "node_modules", 
-      "**/*.spec.ts",
-      "**/*.test.ts"
-    ]
+    "exclude": ["node_modules", "**/*.spec.ts"]
   }
